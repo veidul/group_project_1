@@ -19,14 +19,14 @@ $(document).ready(function () {
 
 
 
-    $('#playbtn').on("click", function (event) {
-        event.preventDefault();
-        playGame;
-    })
+    // $('#playbtn').on("click", function (event) {
+    //     event.preventDefault();
+    //     ();
+    // })
 
     $('#startbtn').on("click", function (event) {
         event.preventDefault();
-        newDeck;
+        newDeck();
     })
 
     function newDeck() {
@@ -38,6 +38,22 @@ $(document).ready(function () {
                 deckId = data.deck_id;
                 splitDeck();
             })
+    }
+
+    function addToPile(codes, pileId){
+        var playerHandApi = `https://deckofcardsapi.com/api/deck/${deckId}/pile/${pileId}/add/?cards=${codes.join(",")}`
+        fetch(playerHandApi)
+            .then(function (resu) {
+                return resu.json()
+            })
+            .then(function (data) {
+                console.log(data)
+            })
+    }
+
+    function draw(number = 1, pileId){
+        //api logic to draw number of cards
+        //when done, addToPile(["ID"], pileId)
     }
 
 
@@ -58,17 +74,17 @@ $(document).ready(function () {
                         console.log(res);
                         var cpuCodes = res.cards.map(function (item) {
                             return item.code
-                        }).join(",");
-
-                        var cpuHandApi = "https://deckofcardsapi.com/api/deck/" + deckId + "/pile/cpuHand/add/?cards=" + cpuCodes
-                        console.log(cpuCodes)
-                        fetch(cpuHandApi)
-                            .then(function (res) {
-                                return res.json()
-                            })
-                            .then(function (cpuHandData) {
-                                console.log(cpuHandData)
-                            })
+                        })
+                        addToPile(cpuCodes, "cpuHand")
+                        // var cpuHandApi = "https://deckofcardsapi.com/api/deck/" + deckId + "/pile/cpuHand/add/?cards=" + cpuCodes
+                        // console.log(cpuCodes)
+                        // fetch(cpuHandApi)
+                        //     .then(function (res) {
+                        //         return res.json()
+                        //     })
+                        //     .then(function (cpuHandData) {
+                        //         console.log(cpuHandData)
+                        //     })
 
                         // response.json().then(function (cpuHand) {
                         //     console.log(cpuHand)
@@ -90,17 +106,20 @@ $(document).ready(function () {
                         console.log(resu);
                         var playerCodes = resu.cards.map(function (item) {
                             return item.code
-                        }).join(",");
+                        })
+                        // .join(",");
 
-                        var playerHandApi = "https://deckofcardsapi.com/api/deck/" + deckId + "/pile/playerHand/add/?cards=" + playerCodes
-                        console.log(playerCodes)
-                        fetch(playerHandApi)
-                            .then(function (resu) {
-                                return resu.json()
-                            })
-                            .then(function (playerHandData) {
-                                console.log(playerHandData)
-                            })
+                        // var playerHandApi = "https://deckofcardsapi.com/api/deck/" + deckId + "/pile/playerHand/add/?cards=" + playerCodes
+                        // console.log(playerCodes)
+                        // fetch(playerHandApi)
+                        //     .then(function (resu) {
+                        //         return resu.json()
+                        //     })
+                        //     .then(function (playerHandData) {
+                        //         console.log(playerHandData)
+                        //     })
+
+                        addToPile(playerCodes, "playerHand")
 
                         // response.json().then(function (cpuHand) {
                         //     console.log(cpuHand)
@@ -109,7 +128,6 @@ $(document).ready(function () {
             })
 
     }
-    playGame
     // document.addEventListener("click", newDeck);
 
 });
