@@ -7,27 +7,15 @@ $(document).ready(function () {
 
     var pullCard = "https://deckofcardsapi.com/api/deck/" + deckId + "/draw/?count=2"
     var splitPlayerHand = "https://deckofcardsapi.com/api/deck/" + deckId + "/draw/?count=26"
-    // var cpuHandApi = "https://deckofcardsapi.com/api/deck/" + deckId + "/pile/cpuHand/add/?cards=" + data.cards.code
+    var cpuHandApi = "https://deckofcardsapi.com/api/deck/" + deckId + "/pile/cpuHand/add/?cards=" + data.cards.code
     var cpuPlayPile = "https://deckofcardsapi.com/api/deck/" + deckId + "/pile/cpuPlayPile/add/"
     var cpuWinnings = "https://deckofcardsapi.com/api/deck/" + deckId + "/pile/cpuWinnings/add/"
-    var playerHand = "https://deckofcardsapi.com/api/deck/" + deckId + "/pile/playerHand/add/"
+    var playerHandApi = "https://deckofcardsapi.com/api/deck/" + deckId + "/pile/playerHand/add/"
 
     var playerWinnings = "https://deckofcardsapi.com/api/deck/" + deckId + "/pile/playerWinnings/add/"
-    
-    function getApi() {
-        fetch(url)
-        .then(function (response) {
-            if (response.ok) {
-                console.log(response);
-                response.json().then(function (deckID) {
-                    console.log(deckID)
-                })
-            }
-        }
-            )
-        }
 
-        function newDeck(){
+
+    function newDeck(){
         fetch("https://deckofcardsapi.com/api/deck/new/shuffle/")
         .then(function(res){
             return res.json()  
@@ -38,8 +26,6 @@ $(document).ready(function () {
         })
     }
 
-    
-    // getApi();
     function splitDeck() {
         var splitCpuHand = "https://deckofcardsapi.com/api/deck/" + deckId + "/draw/?count=26"
         fetch(splitCpuHand)
@@ -113,9 +99,9 @@ $(document).ready(function () {
     var playerValue;
     var cpuValue;
     do{
-        draw(2, playerHand);
+        draw(2, playerHand); // Dependent on draw logic, though this is how I enivision it.
         playerValue = playerPlayPile[1];
-        draw(2, cpuHand);
+        draw(2, cpuHand); // ^
         cpuValue = cpuPlayPile[1];
     } while (playerValue == cpuValue);
  
