@@ -4,8 +4,9 @@ $(document).ready(function () {
     var deckId;
     var playBtn = document.querySelector("playbtn")
     var startBtn = document.querySelector("startbtn")
-
-
+    var cardMap = ["2","3","4","5","6","7","8","9","10","JACK","QUEEN","KING", "ACE"]
+    var playerHandData = [];
+    var cpuHandData = [];
     var pullCard = "https://deckofcardsapi.com/api/deck/" + deckId + "/draw/?count=2"
     var splitPlayerHand = "https://deckofcardsapi.com/api/deck/" + deckId + "/draw/?count=26"
     // var cpuHand = "https://deckofcardsapi.com/api/deck/" + deckId + "/pile/cpuHand/draw/?count=1"
@@ -24,6 +25,7 @@ $(document).ready(function () {
     var image;
     var cardImg;
 
+
     $('#startbtn').on("click", function (event) {
         event.preventDefault();
         newDeck();
@@ -31,14 +33,20 @@ $(document).ready(function () {
 
     $('#playbtn').on("click", function (event) {
         event.preventDefault();
-        draw(1, handId[0], playPile[0]);
-        draw(1, handId[1], playPile[1]);
-    })
+        draw(1, handId[0], handId[1], playPile[0], playPile[1]);
+        // draw(1, handId[1], playPile[1], cpuHandData);
+        // console.log("value test ln 38", playerHandData[0], cpuHandData[0]);
+        // setTimeout(function() {
+        //     compareValues();
+        //   }, 1000);
 
+        
+    })
+    
 
     function newDeck() {
         fetch("https://deckofcardsapi.com/api/deck/new/shuffle/")
-            .then(function (res) {
+        .then(function (res) {
                 return res.json()
             }).then(function (data) {
                 console.log("deck", data);
@@ -46,44 +54,77 @@ $(document).ready(function () {
                 splitDeck();
             })
     }
-
+    
     function addToPile(codes, playPile) {
         var playerHandApi = `https://deckofcardsapi.com/api/deck/${deckId}/pile/${playPile}/add/?cards=${codes
             // .join(",")
-            }`
+        }`
         fetch(playerHandApi)
-            .then(function (resu) {
-                return resu.json()
+        .then(function (resu) {
+            return resu.json()
             })
             .then(function (data) {
                 console.log(data)
             })
+    };
+    function compareValues(number, cpuCard, playerCard) {
+        console.log("compareValues", cpuCard, playerCard)
+        if (cardMap.indexOf(cpuCard) > cardMap.indexOf(playerCard)){
+            console.log("cpu is greater")
+        } else if (cardMap.indexOf(cpuCard) < cardMap.indexOf(playerCard)){
+            console.log("player is greater")
+        } else if (cardMap.indexOf(cpuCard) == cardMap.indexOf(playerCard)) {
+            console.log("WAR!")
+        } else { console.log("Something is broke")}
     }
-
-    function appendCard(inPlay) {
+        // make an array cardMap
+        // if (cardMap.indexOf(cpuCard) > cardsMap.indexOf(playerCard)}
+    function appendCard(inPlay, imgUrl) {
         var img = document.createElement("img");
-        img.src = cardImg
+        img.src = imgUrl
         $("#" + inPlay).append(img)
     }
-
-    function draw(number = 1, handId, playPile) {
+    
+    function draw(number = 1, handId, cpuHandId, playerPile, cpuPile) {
         drawCards = `https://deckofcardsapi.com/api/deck/${deckId}/pile/${handId}/draw/?count=${number}`;
-        if(playPile == playPile[0]) {inPlay = "playerPlayPile"}
-        else {inPlay = "cpuPlayPile"}
+        if (playPile == playerPile[0]) { inPlay = "playerPlayPile" }
+        else { inPlay = "cpuPlayPile" }
         fetch(drawCards)
             .then(function (resu) {
                 return resu.json()
             })
             .then(function (data) {
-                console.log(data)
-                codes = data.cards[0].code
+                console.log(data);
+                //go to go
+                playerHandData.push(data.cards[0].value);
                 value = data.cards[0].value
-                cardImg = `${data.cards[0].image}`
                 // var src = document.getElementById(playerPlayPile)
                 // src.appendChild(img);
-                console.log(codes, value, image)
-                addToPile(codes, playPile)
-                appendCard(inPlay);
+                // console.log(codes, value, image)
+                addToPile(data.cards[0].code, playerPile)
+                appendCard(inPlay,`${data.cards[0].image}`);
+
+                
+                //second call to draw card for cpu
+                drawCards = `https://deckofcardsapi.com/api/deck/${deckId}/pile/${cpuHandId}/draw/?count=${number}`;
+                fetch(drawCards)
+                .then(function (resu) {
+                    return resu.json()
+                })
+                .then(function (data) {
+                    console.log(data);
+                    //go to go
+                    cpuHandData.push(data.cards[0].value);
+                    console.log(playerHandData, cpuHandData)
+                    // codes = data.cards[0].code
+                    // value = data.cards[0].value
+                    // cardImg = `${data.cards[0].image}`
+                    // var src = document.getElementById(playerPlayPile)
+                    // src.appendChild(img);
+                    addToPile(data.cards[0].code, cpuPile)
+                    appendCard(inPlay,`${data.cards[0].image}`);
+                    compareValues(0, cpuHandData.slice(-1)[0], playerHandData.slice(-1)[0])
+                })
             })
         //api logic to draw number of cards
 
@@ -110,7 +151,8 @@ $(document).ready(function () {
                             return item.code
                         })
                         addToPile(cpuCodes, "cpuHand")
-
+                        document.querySelector("#playbtn").setAttribute("style", "display:block");
+                        document.querySelector("#startbtn").setAttribute("style", "display:none");
                     })
                 }
             })
