@@ -1,36 +1,67 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game of War</title>
-    <link rel="stylesheet" href="assets/style.css"/>
+    <link rel="stylesheet" href="assets/style.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+        crossorigin="anonymous"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <title>Game of War</title>
 </head>
-<body>
-    <div>
-        <div id=playerHand></div>
-    </div>
-    <div id=cpuHand></div>
-    <div>
-        <div>
-            <div id=cpuPlayPile><div></div></div>
+
+<body class=bg-success >
+    
+    <nav class></nav>
+    <div id=gameBody>
+    <div id=play style=margin-left:75vh>
+        <div id=cpuPiles>
+            <div class="" id=cpupiles>
+                <div id=cpuHand></div>
+                <div id=cpuWinnings></div>
+            </div>
+            <div></div>
+            <div id=inPlaySpacing>
+                <h1>Computer</h1><div><img src="./assets/card-back.png"></div>
+                <div>
+                    <div id=cpuPlayPile>
+                    </div>
+
+                    <div id="war" style="visibility: hidden;"><text class=war>THIS IS WAR!</text></div>
+                    <div id=playerPlayPile>
+                        <div></div>
+                    </div>
+                </div></div>
+                <div id=playerSpacing >
+                    <div id=playerPiles>
+                        <div id=playerHand><img src="./assets/card-back.png"></div>
+                        <!-- <div id=playerWinnings><img src="./assets/card-back.png"></div> --><h1>Player</h1>
+                    </div>
+                </div>
+                
+            </div>
         </div>
         <div>
-            <div id=playerPlayPile><div></div></div>
-        </div>
-        <div>
-            <div id=playerWinnings></div>
-        </div>
-        <div>
-            <div id=cpuWinnings></div>
-        </div>
-    <button id=startbtn>Start Game</button>
-</div>
-<div>
-    <button id=playbtn style="display: none;">Pull a card!</button>
-</div>
-    <script src="assets/script.js"></script>
-</body>
-</html>
+            <!-- <div id=win style="display: none">YOU WIN!</div>
+                <div id=lose style="display: none">YOU LOSE!</div>
+                <div id=tied style="display: none">YOU TIED!</div> -->
+                <div class=pullCardBtn>
+                    <button id=playbtn style="display: none; margin-left:75vh;">Pull a card!</button>
+                </div></div>
+                <div class=playwar>
+                    <button id="startbtn">Play WAR?</button>
+                </div></div>
+                <div class= bg-success id="gameOver" style="display: none">
+                    <div id=win style="display: none">YOU WIN!</div>
+                    <div id=lose style="display: none">YOU LOSE!</div>
+                    <div id=tied style="display: none">YOU TIED!</div>
+                    <button class=playAgain id=playAgain>PLAY AGAIN?</button></div>
+                <script src="assets/script.js"></script>
+            </body>
+            
+            </html>

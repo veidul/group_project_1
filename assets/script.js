@@ -3,10 +3,17 @@ $(document).ready(function () {
     var cardMap = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "JACK", "QUEEN", "KING", "ACE"]
     var playerHandData = [];
     var cpuHandData = [];
+    var playerWinnings = 'playerWinnings';
+    var cpuWinnings = 'cpuWinnings';
     var pileId = ["playerPlayPile", "cpuPlayPile", 'playerWinnings', 'cpuWinnings'];
     var handId = ["playerHand", "cpuHand"]
     var drawCards;
     var remaining;
+    // var warDelay = warDelay();
+    // function warDelay(){
+        // document.querySelector("#war").innerHTML("<h1 style=font-size:200px>WAR!<h1>");
+        //                     $("#war").delay(5000).hide(compareValues(0, cpuHandData, playerHandData, true))
+    // }
 
     $('#startbtn').on("click", function (event) {
         event.preventDefault();
@@ -81,10 +88,17 @@ $(document).ready(function () {
             addToPile(pot, pileId[2]);
         } else {
             console.log("WAR!");
-            draw(2, handId[0], handId[1], true);
+            document.querySelector('#war').style.visibility="visible";
+                            $("#war").delay(2000).queue(function(){
+                        document.querySelector('#war').style.visibility="hidden";
+                        draw(2, handId[0], handId[1], true);
+                        $("#war").dequeue();
+                        })
+            
         } 
     }
     function appendCard(inPlay, imgUrl) {
+        document.querySelector("#play").setAttribute("style", "display:block");
         var img = document.createElement("img");
         img.src = imgUrl
         $("#" + inPlay).html(img)
@@ -135,7 +149,8 @@ $(document).ready(function () {
                         
                         appendCard('cpuPlayPile', `${data.cards[0].image}`);
                         if (isWar) {
-                            compareValues(0, cpuHandData, playerHandData, true)
+                            compareValues(0, cpuHandData, playerHandData, true);
+                            
                         } else {
                             compareValues
                             compareValues(0, cpuHandData.slice(-1)[0], playerHandData.slice(-1)[0])
@@ -155,7 +170,7 @@ $(document).ready(function () {
                             return item.code
                         })
                         addToPile(cpuCodes, "cpuHand")
-                        document.querySelector("#playbtn").setAttribute("style", "display:block");
+                        document.querySelector("#playbtn").setAttribute("style", "display:box");
                         document.querySelector("#startbtn").setAttribute("style", "display:none");
                     })
                 }
@@ -181,6 +196,11 @@ $(document).ready(function () {
         console.log(remaining)
         winLose()
     };
+    function loadWinHTML(){
+            document.querySelector("#gameBody").setAttribute("style", "display:none");
+            document.querySelector("#gameOver").setAttribute("style", "display:box")
+
+    }
     function winLose() {
         var playerWinningsList = "https://deckofcardsapi.com/api/deck/" + deckId + "/pile/playerWinnings/list/"
         var cpuWinningsValue;
@@ -198,15 +218,19 @@ $(document).ready(function () {
 
             })
             function winLoseTieDisplay() {
+                loadWinHTML();
                 if (playerWinningsValue > cpuWinningsValue) {
                     console.log("YOU WIN!") 
+                    document.querySelector("#win").setAttribute("style", "display:box");
                     // add display message ,YOU WIN!
                 }
                 else if (playerWinningsValue === cpuWinningsValue) {
                     console.log("YOU TIED!")
+                    document.querySelector("#tied").setAttribute("style", "display:box");
                     // add display message ,YOU TIED!
                 }
                 else (console.log("YOU LOSE!"))
+                document.querySelector("#lose").setAttribute("style", "display:box");
                 // add display message ,YOU LOSE!
             }
     }

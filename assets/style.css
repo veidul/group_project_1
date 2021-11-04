@@ -1,0 +1,56 @@
+* {
+    margin: 0;
+    padding: 0;
+    font-family: 'Gemunu Libre', sans-serif;
+}
+.playwar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 32px;
+    height: 100vh;
+}
+.pullCardBtn{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 32px;
+    height: 10vh;
+}
+#play,#playAgain{
+    display:none;
+    width: 25vh;
+    height:7vh;
+    position: relative;
+}
+#startbtn{
+    width: 25vh;
+    height:7vh;
+    position: relative;
+}
+#cpuWinIMG{
+    display:none;
+}
+#playerWinIMG{
+    display:none;
+}
+#win,#lose,#tied{
+    text-align:center;
+    font-size:500px;
+    
+} 
+.playAgain{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 32px;
+    height: 10vh;
+}
+#playAgain{
+    width: 25vh;
+    height:7vh;
+    position: relative;
+}
+.war{
+    font-size:32px;
+}
