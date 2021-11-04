@@ -10,4 +10,4 @@ if your card value is equal to the computer you will go to WAR!
 WAR = player and cpu pull 2 cards if your last card drawns value is higher than the computer you all of the cards that were drawn will go to your points.
 To win the game you must have more points than the opponent.
 
-
+https://ahnmac.github.io/group_project_1/
