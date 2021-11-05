@@ -1,0 +1,19 @@
+function addToPile(codes, pileId) {
+        var playerHandApi = `https://deckofcardsapi.com/api/deck/${deckId}/pile/${pileId}/add/?cards=${codes.join(",")
+            }`
+        fetch(playerHandApi)
+            .then(function (resu) {
+                return resu.json()
+            })
+            .then(function (data) {
+                document.getElementById("CPU").innerHTML = `<h1 id = 'CPU'> Computer: ${data.piles.cpuWinnings.remaining}`;
+                document.getElementById("Player").innerHTML = `<h1 id = 'Player'> Player: ${data.piles.playerWinnings.remaining}`;
+                getCurrentPiles(pileId);
+
+                remaining = data.piles.cpuHand.remaining
+            })
+
+    }
+    
+    // Dependent on indexHTML changes below
+    // - Addition of id to both the player and cpu <h1> tags.
