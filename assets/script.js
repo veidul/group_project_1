@@ -1,179 +1,244 @@
 $(document).ready(function () {
-
-    var url = "http://deckofcardsapi.com/api/deck/new/";
     var deckId;
+    var cardMap = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "JACK", "QUEEN", "KING", "ACE"]
+    var playerHandData = [];
+    var cpuHandData = [];
+    var playerWinnings = 'playerWinnings';
+    var cpuWinnings = 'cpuWinnings';
+    var pileId = ["playerPlayPile", "cpuPlayPile", 'playerWinnings', 'cpuWinnings'];
+    var handId = ["playerHand", "cpuHand"]
+    var drawCards;
+    var remaining;
+    // var warDelay = warDelay();
+    // function warDelay(){
+        // document.querySelector("#war").innerHTML("<h1 style=font-size:200px>WAR!<h1>");
+        //                     $("#war").delay(5000).hide(compareValues(0, cpuHandData, playerHandData, true))
+    // }
 
+    $('#startbtn').on("click", function (event) {
+        event.preventDefault();
+        newDeck();
+    })
 
+    $('#playbtn').on("click", function (event) {
+        event.preventDefault();
+        draw(1, handId[0], handId[1]);
+    })
 
-    var pullCard = "https://deckofcardsapi.com/api/deck/" + deckId + "/draw/?count=2"
-    var splitPlayerHand = "https://deckofcardsapi.com/api/deck/" + deckId + "/draw/?count=26"
-    var cpuHandApi = "https://deckofcardsapi.com/api/deck/" + deckId + "/pile/cpuHand/add/?cards=" + data.cards.code
-    var cpuPlayPile = "https://deckofcardsapi.com/api/deck/" + deckId + "/pile/cpuPlayPile/add/"
-    var cpuWinnings = "https://deckofcardsapi.com/api/deck/" + deckId + "/pile/cpuWinnings/add/"
-    var playerHandApi = "https://deckofcardsapi.com/api/deck/" + deckId + "/pile/playerHand/add/"
-
-    var playerWinnings = "https://deckofcardsapi.com/api/deck/" + deckId + "/pile/playerWinnings/add/"
-
-
-    function newDeck(){
+    function newDeck() {
         fetch("https://deckofcardsapi.com/api/deck/new/shuffle/")
-        .then(function(res){
-            return res.json()  
-        }).then(function(data){
-            console.log("deck", data);
-            deckId = data.deck_id;
-            splitDeck();
-        })
+            .then(function (res) {
+                return res.json()
+            }).then(function (data) {
+                deckId = data.deck_id;
+                splitDeck();
+            })
+    }
+
+    function getCurrentPiles(pileId) {
+        fetch(`https://deckofcardsapi.com/api/deck/${deckId}/pile/${pileId}/list`)
+            .then(function (res) { return res.json() })
+            .then(function (data) {
+                console.log("DATA ---- ", data)
+                if (data.piles.playerHand.remaining === 0) {
+                    
+                    winLose()
+                };
+            })
+    }
+
+    function addToPile(codes, pileId) {
+        var playerHandApi = `https://deckofcardsapi.com/api/deck/${deckId}/pile/${pileId}/add/?cards=${codes.join(",")
+            }`
+        fetch(playerHandApi)
+            .then(function (resu) {
+                return resu.json()
+            })
+            .then(function (data) {
+                getCurrentPiles(pileId);
+                remaining = data.piles.cpuHand.remaining
+            })
+
+    }
+
+    function compareValues(number, cpuCard, playerCard, isWar) {
+        console.log(isWar)
+        console.log("compareValues", cpuCard, playerCard);
+        var pot = [];
+        var val1, val2;
+        if (isWar) {
+            pot = cpuCard.map(function (a) {
+                return a.code
+            }).concat(playerCard.map(function (a) {
+                return a.code
+            }));
+            val1 = cpuCard[2].value;
+            val2 = playerCard[2].value;
+        } else {
+            pot = [playerCard.code, cpuCard.code];
+            val1 = cpuCard.value;
+            val2 = playerCard.value;
+        }
+
+        if (cardMap.indexOf(val1) > cardMap.indexOf(val2)) {
+            console.log("CPU WINS", val1, val2);
+            addToPile(pot, pileId[3]);
+        } else if (cardMap.indexOf(val1) < cardMap.indexOf(val2)) {
+            console.log("PLAYER WINS", val1, val2)
+            addToPile(pot, pileId[2]);
+        } else {
+            console.log("WAR!");
+            document.querySelector('#war').style.visibility="visible";
+                            $("#war").delay(2000).queue(function(){
+                        document.querySelector('#war').style.visibility="hidden";
+                        draw(2, handId[0], handId[1], true);
+                        $("#war").dequeue();
+                        })
+            
+        } 
+    }
+      function appendCard(inPlay, imgUrl) {
+        console.log($(`.${inPlay} img:nth-child(2)`))
+        if ($(`.${inPlay} img:nth-child(2)`).length >= 1) {
+            $(`.${inPlay} img:nth-child(2)`).attr('src', imgUrl)
+        } else {
+            $(`.${inPlay}`).append(`<img id='${inPlay}Stack' src="${imgUrl}"/>`)
+        }
+        // var img = document.createElement("img");
+        // img.src = imgUrl
+    }
+
+
+    function draw(number = 1, handId, cpuHandId, isWar) {
+        console.log(isWar)
+        drawCards = `https://deckofcardsapi.com/api/deck/${deckId}/pile/${handId}/draw/?count=${number}`;
+        fetch(drawCards)
+            .then(function (resu) {
+                return resu.json()
+            })
+            .then(function (data) {
+                playerHandData = isWar ? playerHandData.concat(data.cards.map(function (card) {
+                    
+                    return {
+                        value: card.value,
+                        code: card.code
+
+                    }
+                })) : data.cards.map(function (card) {
+                    return {
+                        value: card.value,
+                        code: card.code
+                    }                    
+                });
+                
+                appendCard('playerImgContainer', `${data.cards[0].image}`);
+                
+                drawCards = `https://deckofcardsapi.com/api/deck/${deckId}/pile/${cpuHandId}/draw/?count=${number}`;
+                fetch(drawCards)
+                    .then(function (resu) {
+                        return resu.json()
+                    })
+                    .then(function (data) {
+                        
+                        cpuHandData = isWar ? cpuHandData.concat(data.cards.map(function (card) {
+                            return {
+                                value: card.value,
+                                code: card.code
+                            }
+                        })) : data.cards.map(function (card) {
+                            return {
+                                value: card.value,
+                                code: card.code,
+                            }
+                        });
+                        
+                        appendCard('cpuImgContainer', `${data.cards[0].image}`);
+                        if (isWar) {
+                            compareValues(0, cpuHandData, playerHandData, true);
+                            
+                        } else {
+                            compareValues
+                            compareValues(0, cpuHandData.slice(-1)[0], playerHandData.slice(-1)[0])
+                        }
+                    })
+            })
+
     }
 
     function splitDeck() {
         var splitCpuHand = "https://deckofcardsapi.com/api/deck/" + deckId + "/draw/?count=26"
         fetch(splitCpuHand)
-        // need to get the deck_id added before this will run
-        .then(function (response) {
-            if (response.ok) {
-                console.log(response);
-                //build new url based on response;
-                response.json().then(function (res) {
-                    // console.log(cpuHandPile)
-                    // fetch(cpuHandApi)
-                    //     .then(function (res) {
-                        
-                        console.log(res);
-                        var cpuCodes = res.cards.map(function(item){
+            .then(function (response) {
+                if (response.ok) {
+                    response.json().then(function (res) {
+                        var cpuCodes = res.cards.map(function (item) {
                             return item.code
-                        }).join(",");
-                        
-                       var cpuHandApi = "https://deckofcardsapi.com/api/deck/" + deckId + "/pile/cpuHand/add/?cards=" + cpuCodes
-                                    console.log(cpuCodes)
-                                    fetch(cpuHandApi)
-                                    .then(function(res){
-                                        return res.json()
-                                    })
-                                    .then(function(cpuHandData){
-                                        console.log(cpuHandData)
-                                    })
-
-                                    // response.json().then(function (cpuHand) {
-                                    //     console.log(cpuHand)
+                        })
+                        addToPile(cpuCodes, "cpuHand")
+                        document.querySelector("#playbtn").setAttribute("style", "display:block");
+                        document.querySelector("#play").style.display = "block";
+                        document.querySelector("#startbtn").setAttribute("style", "display:none");
                     })
                 }
             })
-            var splitPlayerHand = "https://deckofcardsapi.com/api/deck/" + deckId + "/draw/?count=26"
+        var splitPlayerHand = "https://deckofcardsapi.com/api/deck/" + deckId + "/draw/?count=26"
         fetch(splitPlayerHand)
-        // need to get the deck_id added before this will run
-        .then(function (response) {
-            if (response.ok) {
-                console.log(response);
-                //build new url based on response;
-                response.json().then(function (resu) {
-                    // console.log(cpuHandPile)
-                    // fetch(cpuHandApi)
-                    //     .then(function (res) {
-                        
-                        console.log(resu);
-                        var playerCodes = resu.cards.map(function(item){
+            .then(function (response) {
+                if (response.ok) {
+                    response.json().then(function (resu) {
+                        var playerCodes = resu.cards.map(function (item) {
                             return item.code
-                        }).join(",");
-                        
-                       var playerHandApi = "https://deckofcardsapi.com/api/deck/" + deckId + "/pile/cpuHand/add/?cards=" + playerCodes
-                                    console.log(playerCodes)
-                                    fetch(playerHandApi)
-                                    .then(function(resu){
-                                        return resu.json()
-                                    })
-                                    .then(function(playerHandData){
-                                        console.log(playerHandData)
-                                    })
+                        })
 
-                                    // response.json().then(function (cpuHand) {
-                                    //     console.log(cpuHand)
+                        addToPile(playerCodes, "playerHand")
+
                     })
                 }
             })
 
     }
-    document.addEventListener("click", newDeck);
-    
-    function war() {
-    var playerValue;
-    var cpuValue;
-    do{
-        draw(2, playerHand); // Dependent on draw logic, though this is how I enivision it.
-        playerValue = playerPlayPile[1];
-        draw(2, cpuHand); // ^
-        cpuValue = cpuPlayPile[1];
-    } while (playerValue == cpuValue);
- 
-    
-    if (playerValue > cpuValue)
-    {
-        fetch(moveToPlayerWinnings)
-        .then(function(data) {
-            console.log(data);
-        })
+
+    if (remaining = 0) {
+        console.log(remaining)
+        winLose()
+    };
+    function loadWinHTML(){
+            document.querySelector("#gameBody").setAttribute("style", "display:none");
+            document.querySelector("#gameOver").setAttribute("style", "display:box")
+
     }
-    else if (cpuValue > playerValue)
-    {
-     fetch(moveToCPUWinnings)
-     .then(function(data) {
-         console.log(data);
-     })
- }
- }
+    function winLose() {
+        var playerWinningsList = "https://deckofcardsapi.com/api/deck/" + deckId + "/pile/playerWinnings/list/"
+        var cpuWinningsValue;
+        var playerWinningsValue;
+        fetch(playerWinningsList)
+            .then(function (response) {
+                if (response.ok) {
+                    response.json().then(function (res) {
+                        playerWinningsValue = res.piles.playerWinnings.remaining
+                        cpuWinningsValue = res.piles.cpuWinnings.remaining
+                        console.log("winnings",cpuWinningsValue,playerWinningsValue)
+                        winLoseTieDisplay(playerWinningsValue, cpuWinningsValue);
+                    })
+                }
 
-
-function compareValues(){
-    var cpuPlayPile = "https://deckofcardsapi.com/api/deck/" + deckId + "/pile/cpuPlayPile/list/";
-    var playerPlayPile = "https://deckofcardsapi.com/api/deck/" + deckId + "/pile/playerPlayPile/list/";
-    var moveToPlayerWinnings;
-    var moveToCPUWinnings;
-    var playerValue;
-    var cpuValue;
-
-    fetch(cpuPlayPile)
-    .then (function (res)
-    {
-        return res.json()
-    }).then(function(data){
-        console.log("CPU Card: ", data);
-        cpuValue = data.cards[0].value;
-        var cpuCode = data.cards[0].code;
-        moveToCPUWinnings = "https://deckofcardsapi.com/api/deck/" + deckId + "/pile/CPUPlayPile/add/?cards=" + playerCode + "," + cpuCode;
-        fetch (playerPlayPile)
-    .then (function(res)
-    {
-        return res.json()
-    }).then(function(data){
-        console.log("Player Card: ", data);
-        playerValue = data.cards[0].value;
-        var playerCode = data.cards[0].code;
-        moveToPlayerWinnings = "https://deckofcardsapi.com/api/deck/" + deckId + "/pile/playerPlayPile/add/?cards=" + playerCode + "," + cpuCode;
-
-    })
-    if (playerValue > cpuValue)
-    {
-        fetch(moveToPlayerWinnings)
-        .then (function(data)
-        {
-            console.log(data);
-        })
-        
+            })
+            function winLoseTieDisplay() {
+                loadWinHTML();
+                if (playerWinningsValue > cpuWinningsValue) {
+                    console.log("YOU WIN!") 
+                    document.querySelector("#win").setAttribute("style", "display:box");
+                    // add display message ,YOU WIN!
+                }
+                else if (playerWinningsValue === cpuWinningsValue) {
+                    console.log("YOU TIED!")
+                    document.querySelector("#tied").setAttribute("style", "display:box");
+                    // add display message ,YOU TIED!
+                }
+                else (console.log("YOU LOSE!"))
+                document.querySelector("#lose").setAttribute("style", "display:box");
+                // add display message ,YOU LOSE!
+            }
     }
-    else if (cpuValue > playerValue)
-    {
-        fetch(moveToCPUWinnings)
-        .then(function(data) {
-            console.log(data);
-        })
-    }
-    else if (cpuValue == playerValue)
-    {
-        war();
-    }
-   
-    
-    
-}
 
-});    
+});
