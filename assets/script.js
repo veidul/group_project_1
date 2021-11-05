@@ -57,6 +57,13 @@ $(document).ready(function () {
             .then(function (data) {
                 getCurrentPiles(pileId);
                 remaining = data.piles.cpuHand.remaining
+                console.log(1, remaining)
+                if (remaining < 25)
+            {
+                updateScore();
+                console.log(remaining);
+            }
+             
             })
 
     }
@@ -117,6 +124,7 @@ $(document).ready(function () {
                 return resu.json()
             })
             .then(function (data) {
+
                 playerHandData = isWar ? playerHandData.concat(data.cards.map(function (card) {
                     
                     return {
@@ -130,6 +138,7 @@ $(document).ready(function () {
                         code: card.code
                     }                    
                 });
+                
                 
                 appendCard('playerImgContainer', `${data.cards[0].image}`);
                 
@@ -153,6 +162,8 @@ $(document).ready(function () {
                         });
                         
                         appendCard('cpuImgContainer', `${data.cards[0].image}`);
+                        
+
                         if (isWar) {
                             compareValues(0, cpuHandData, playerHandData, true);
                             
@@ -160,6 +171,7 @@ $(document).ready(function () {
                             compareValues
                             compareValues(0, cpuHandData.slice(-1)[0], playerHandData.slice(-1)[0])
                         }
+                        
                     })
             })
 
@@ -207,6 +219,25 @@ $(document).ready(function () {
             document.querySelector("#gameOver").setAttribute("style", "display:box")
 
     }
+
+    function updateScore(){
+        var playerWinnings = "https://deckofcardsapi.com/api/deck/" + deckId + "/pile/playerWinnings/list/";
+        var cpuWinningsVal;
+        var playerWinningsVal;
+        fetch (playerWinnings)
+        .then(function (res){
+            if (res.ok)
+            res.json().then(function(data){
+                playerWinningsVal = data.piles.playerWinnings.remaining;
+                cpuWinningsVal = data.piles.cpuWinnings.remaining
+                
+            }).then(function(){
+                document.getElementById("CPU").innerHTML = `<h1 id = 'CPU'> Computer: ${cpuWinningsVal}`;
+                document.getElementById("Player").innerHTML = `<h1 id = 'Player'> Player: ${playerWinningsVal}`;
+            })
+        })
+    }
+
     function winLose() {
         var playerWinningsList = "https://deckofcardsapi.com/api/deck/" + deckId + "/pile/playerWinnings/list/"
         var cpuWinningsValue;
