@@ -1,32 +1,50 @@
 * {
     margin: 0;
     padding: 0;
-    font-family: 'Gemunu Libre', sans-serif;
+    font-family: 'Irish Grover', cursive;
+    text-align: center;
 }
+
+.cpuImgContainer, .playerImgContainer, .pullCardBtn, #card-back {
+    width: fit-content;
+    margin:auto;
+    position:relative;
+    border-radius: 15px;
+}
+
+
+
 .playwar {
     display: flex;
     justify-content: center;
     align-items: center;
     font-size: 32px;
-    height: 100vh;
+    margin-top: 50vh;
+    
 }
 .pullCardBtn{
-    display: flex;
+    display: block;
     justify-content: center;
     align-items: center;
-    font-size: 32px;
-    height: 10vh;
+    font-size: 28px;
+    margin-bottom: 30px;
+    
+   
+}
+#playbtn {
+    margin-bottom: 30px;
+    background-color: #7b1113;
+    border-radius: 12px;
 }
 #play,#playAgain{
     display:none;
-    width: 25vh;
-    height:7vh;
     position: relative;
 }
 #startbtn{
     width: 25vh;
-    height:7vh;
     position: relative;
+    background-color: #7b1113;
+    border-radius:12px;
 }
 #cpuWinIMG{
     display:none;
@@ -44,13 +62,23 @@
     justify-content: center;
     align-items: center;
     font-size: 32px;
-    height: 10vh;
 }
 #playAgain{
     width: 25vh;
-    height:7vh;
     position: relative;
 }
 .war{
     font-size:32px;
 }
+
+/* #cpuPlayPile, #playerPlayPile {
+    position: absolute;
+    
+} */
+/* #playerPiles{
+width: fit-content;
+  position: relative;
+    margin: auto;}
+#cpuPiles{width: fit-content;
+  position: relative;
+    margin: auto;} */

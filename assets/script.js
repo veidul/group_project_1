@@ -55,11 +55,19 @@ $(document).ready(function () {
                 return resu.json()
             })
             .then(function (data) {
-                document.getElementById("CPU").innerHTML = `<h1 id = 'CPU'> Computer: ${data.piles.cpuWinnings.remaining}`;
-                document.getElementById("Player").innerHTML = `<h1 id = 'Player'> Player: ${data.piles.playerWinnings.remaining}`;
                 getCurrentPiles(pileId);
-
+                try{
                 remaining = data.piles.cpuHand.remaining
+                console.log(1, remaining)
+                if (remaining < 26)
+            {
+                updateScore();
+                console.log(remaining);
+            }}
+            catch{
+                console.log("Hands not yet populated")
+            }
+             
             })
 
     }
@@ -91,21 +99,29 @@ $(document).ready(function () {
             addToPile(pot, pileId[2]);
         } else {
             console.log("WAR!");
+            document.querySelector("#playbtn").style.display="none";
             document.querySelector('#war').style.visibility="visible";
                             $("#war").delay(2000).queue(function(){
                         document.querySelector('#war').style.visibility="hidden";
+                        document.querySelector("#playbtn").style.display="block";
                         draw(2, handId[0], handId[1], true);
                         $("#war").dequeue();
                         })
+                        
             
         } 
     }
-    function appendCard(inPlay, imgUrl) {
-        document.querySelector("#play").setAttribute("style", "display:block");
-        var img = document.createElement("img");
-        img.src = imgUrl
-        $("#" + inPlay).html(img)
+      function appendCard(inPlay, imgUrl) {
+        console.log($(`.${inPlay} img:nth-child(2)`))
+        if ($(`.${inPlay} img:nth-child(2)`).length >= 1) {
+            $(`.${inPlay} img:nth-child(2)`).attr('src', imgUrl)
+        } else {
+            $(`.${inPlay}`).append(`<img id='${inPlay}Stack' src="${imgUrl}"/>`)
+        }
+        // var img = document.createElement("img");
+        // img.src = imgUrl
     }
+
 
     function draw(number = 1, handId, cpuHandId, isWar) {
         console.log(isWar)
@@ -114,7 +130,9 @@ $(document).ready(function () {
             .then(function (resu) {
                 return resu.json()
             })
-            .then(function (data) {
+            .then(function (data) 
+            {
+
                 playerHandData = isWar ? playerHandData.concat(data.cards.map(function (card) {
                     
                     return {
@@ -129,7 +147,8 @@ $(document).ready(function () {
                     }                    
                 });
                 
-                appendCard('playerPlayPile', `${data.cards[0].image}`);
+                
+                appendCard('playerImgContainer', `${data.cards[0].image}`);
                 
                 drawCards = `https://deckofcardsapi.com/api/deck/${deckId}/pile/${cpuHandId}/draw/?count=${number}`;
                 fetch(drawCards)
@@ -150,7 +169,9 @@ $(document).ready(function () {
                             }
                         });
                         
-                        appendCard('cpuPlayPile', `${data.cards[0].image}`);
+                        appendCard('cpuImgContainer', `${data.cards[0].image}`);
+                        
+
                         if (isWar) {
                             compareValues(0, cpuHandData, playerHandData, true);
                             
@@ -158,6 +179,7 @@ $(document).ready(function () {
                             compareValues
                             compareValues(0, cpuHandData.slice(-1)[0], playerHandData.slice(-1)[0])
                         }
+                        
                     })
             })
 
@@ -173,7 +195,8 @@ $(document).ready(function () {
                             return item.code
                         })
                         addToPile(cpuCodes, "cpuHand")
-                        document.querySelector("#playbtn").setAttribute("style", "display:box");
+                        document.querySelector("#playbtn").setAttribute("style", "display:block");
+                        document.querySelector("#play").style.display = "block";
                         document.querySelector("#startbtn").setAttribute("style", "display:none");
                     })
                 }
@@ -204,6 +227,28 @@ $(document).ready(function () {
             document.querySelector("#gameOver").setAttribute("style", "display:box")
 
     }
+
+    function updateScore(){
+        var playerWinnings = "https://deckofcardsapi.com/api/deck/" + deckId + "/pile/playerWinnings/list/";
+        var cpuWinningsVal;
+        var playerWinningsVal;
+        fetch (playerWinnings)
+        .then(function (res){
+            if (res.ok)
+            res.json().then(function(data){
+                try {
+                playerWinningsVal = data.piles.playerWinnings.remaining;
+                cpuWinningsVal = data.piles.cpuWinnings.remaining
+                document.getElementById("CPU").innerHTML = `<h1 id = 'CPU'> Computer: ${cpuWinningsVal}`;
+                document.getElementById("Player").innerHTML = `<h1 id = 'Player'> Player: ${playerWinningsVal}`;
+            }
+            catch{
+                console.log("Winnings piles unpopulated")
+            }   
+            })
+        })
+    }
+
     function winLose() {
         var playerWinningsList = "https://deckofcardsapi.com/api/deck/" + deckId + "/pile/playerWinnings/list/"
         var cpuWinningsValue;
@@ -212,10 +257,17 @@ $(document).ready(function () {
             .then(function (response) {
                 if (response.ok) {
                     response.json().then(function (res) {
+                        try{
                         playerWinningsValue = res.piles.playerWinnings.remaining
                         cpuWinningsValue = res.piles.cpuWinnings.remaining
                         console.log("winnings",cpuWinningsValue,playerWinningsValue)
                         winLoseTieDisplay(playerWinningsValue, cpuWinningsValue);
+                        }
+                        catch{
+                            console.log("Oops, winLose() at line 252 trying to run too soon!\n"
+                            + "let's check how many cards the player has, and then try again\nRemaining: ", remaining);
+                            
+                        }
                     })
                 }
 
@@ -239,4 +291,3 @@ $(document).ready(function () {
     }
 
 });
-
