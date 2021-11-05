@@ -55,7 +55,10 @@ $(document).ready(function () {
                 return resu.json()
             })
             .then(function (data) {
+                document.getElementById("CPU").innerHTML = `<h1 id = 'CPU'> Computer: ${data.piles.cpuWinnings.remaining}`;
+                document.getElementById("Player").innerHTML = `<h1 id = 'Player'> Player: ${data.piles.playerWinnings.remaining}`;
                 getCurrentPiles(pileId);
+
                 remaining = data.piles.cpuHand.remaining
             })
 
