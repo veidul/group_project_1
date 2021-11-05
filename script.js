@@ -56,12 +56,16 @@ $(document).ready(function () {
             })
             .then(function (data) {
                 getCurrentPiles(pileId);
+                try{
                 remaining = data.piles.cpuHand.remaining
                 console.log(1, remaining)
                 if (remaining < 26)
             {
                 updateScore();
                 console.log(remaining);
+            }}
+            catch{
+                console.log("Hands not yet populated")
             }
              
             })
@@ -95,12 +99,15 @@ $(document).ready(function () {
             addToPile(pot, pileId[2]);
         } else {
             console.log("WAR!");
+            document.querySelector("#playbtn").style.display="none";
             document.querySelector('#war').style.visibility="visible";
                             $("#war").delay(2000).queue(function(){
                         document.querySelector('#war').style.visibility="hidden";
+                        document.querySelector("#playbtn").style.display="block";
                         draw(2, handId[0], handId[1], true);
                         $("#war").dequeue();
                         })
+                        
             
         } 
     }
@@ -123,7 +130,8 @@ $(document).ready(function () {
             .then(function (resu) {
                 return resu.json()
             })
-            .then(function (data) {
+            .then(function (data) 
+            {
 
                 playerHandData = isWar ? playerHandData.concat(data.cards.map(function (card) {
                     
@@ -249,10 +257,17 @@ $(document).ready(function () {
             .then(function (response) {
                 if (response.ok) {
                     response.json().then(function (res) {
+                        try{
                         playerWinningsValue = res.piles.playerWinnings.remaining
                         cpuWinningsValue = res.piles.cpuWinnings.remaining
                         console.log("winnings",cpuWinningsValue,playerWinningsValue)
                         winLoseTieDisplay(playerWinningsValue, cpuWinningsValue);
+                        }
+                        catch{
+                            console.log("Oops, winLose() at line 252 trying to run too soon!\n"
+                            + "let's check how many cards the player has, and then try again\nRemaining: ", remaining);
+                            
+                        }
                     })
                 }
 
@@ -264,14 +279,15 @@ $(document).ready(function () {
                     document.querySelector("#win").setAttribute("style", "display:box");
                     // add display message ,YOU WIN!
                 }
-                else if (playerWinningsValue === cpuWinningsValue) {
+                else if(cpuWinningsValue > playerWinningsValue){
+                document.querySelector("#lose").setAttribute("style", "display:box");}
+                // add display message ,YOU LOSE!
+                else if (cpuWinningsValue === playerWinningsValue){
                     console.log("YOU TIED!")
                     document.querySelector("#tied").setAttribute("style", "display:box");
                     // add display message ,YOU TIED!
                 }
-                else (console.log("YOU LOSE!"))
-                document.querySelector("#lose").setAttribute("style", "display:box");
-                // add display message ,YOU LOSE!
+                
             }
     }
 
