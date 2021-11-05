@@ -279,14 +279,15 @@ $(document).ready(function () {
                     document.querySelector("#win").setAttribute("style", "display:box");
                     // add display message ,YOU WIN!
                 }
-                else if (playerWinningsValue === cpuWinningsValue) {
+                else if(cpuWinningsValue > playerWinningsValue){
+                document.querySelector("#lose").setAttribute("style", "display:box");}
+                // add display message ,YOU LOSE!
+                else if (cpuWinningsValue === playerWinningsValue){
                     console.log("YOU TIED!")
                     document.querySelector("#tied").setAttribute("style", "display:box");
                     // add display message ,YOU TIED!
                 }
-                else (console.log("YOU LOSE!"))
-                document.querySelector("#lose").setAttribute("style", "display:box");
-                // add display message ,YOU LOSE!
+                
             }
     }
 
