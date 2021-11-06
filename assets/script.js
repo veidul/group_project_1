@@ -3,8 +3,6 @@ $(document).ready(function () {
     var cardMap = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "JACK", "QUEEN", "KING", "ACE"]
     var playerHandData = [];
     var cpuHandData = [];
-    var playerWinnings = 'playerWinnings';
-    var cpuWinnings = 'cpuWinnings';
     var pileId = ["playerPlayPile", "cpuPlayPile", 'playerWinnings', 'cpuWinnings'];
     var handId = ["playerHand", "cpuHand"]
     var drawCards;
@@ -17,6 +15,7 @@ $(document).ready(function () {
 
     $('#startbtn').on("click", function (event) {
         event.preventDefault();
+        document.querySelector("#playwar").style.display="none";
         newDeck();
     })
 
@@ -26,6 +25,7 @@ $(document).ready(function () {
     })
 
     function newDeck() {
+        
         fetch("https://deckofcardsapi.com/api/deck/new/shuffle/")
             .then(function (res) {
                 return res.json()
@@ -100,9 +100,9 @@ $(document).ready(function () {
         } else {
             console.log("WAR!");
             document.querySelector("#playbtn").style.display="none";
-            document.querySelector('#war').style.visibility="visible";
+            document.querySelector('#war').style.display="block";
                             $("#war").delay(2000).queue(function(){
-                        document.querySelector('#war').style.visibility="hidden";
+                        document.querySelector('#war').style.display="none";
                         document.querySelector("#playbtn").style.display="block";
                         draw(2, handId[0], handId[1], true);
                         $("#war").dequeue();
@@ -147,8 +147,14 @@ $(document).ready(function () {
                     }                    
                 });
                 
+                if(isWar){
+                appendCard('playerImgContainer', `${data.cards[1].image}`);
                 
+                }
+                else {
                 appendCard('playerImgContainer', `${data.cards[0].image}`);
+             
+                }
                 
                 drawCards = `https://deckofcardsapi.com/api/deck/${deckId}/pile/${cpuHandId}/draw/?count=${number}`;
                 fetch(drawCards)
@@ -171,11 +177,12 @@ $(document).ready(function () {
                         
                         appendCard('cpuImgContainer', `${data.cards[0].image}`);
                         
-
                         if (isWar) {
                             compareValues(0, cpuHandData, playerHandData, true);
+                            appendCard('cpuImgContainer', `${data.cards[1].image}`);
                             
                         } else {
+                            appendCard('cpuImgContainer', `${data.cards[0].image}`);
                             compareValues
                             compareValues(0, cpuHandData.slice(-1)[0], playerHandData.slice(-1)[0])
                         }
